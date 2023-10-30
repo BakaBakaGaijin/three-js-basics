@@ -2,7 +2,7 @@ import { Component, MutableRefObject } from "react";
 import * as THREE from "three";
 import { FrameHandler } from "../../utils/FrameHandler";
 
-const { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshBasicMaterial, Mesh } = THREE;
+const { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshPhongMaterial, Mesh } = THREE;
 
 interface CubeRendererProps {
     containerRef: MutableRefObject<HTMLDivElement | null>;
@@ -33,9 +33,13 @@ class CubeRenderer extends Component<CubeRendererProps> {
         this.props.containerRef.current?.append(this.renderer.domElement);
 
         const geometry = new BoxGeometry(1, 1, 1);
-        const material = new MeshBasicMaterial({ color: 0x00ff00 });
+        const material = new MeshPhongMaterial({ color: 0x00ff00 });
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+        directionalLight.position.set(-1, 0, 1).normalize();
+
         this.cube = new Mesh(geometry, material);
         this.scene.add(this.cube);
+        this.scene.add(directionalLight);
         this.camera.position.z = 5;
 
         this.frameHandler.start();

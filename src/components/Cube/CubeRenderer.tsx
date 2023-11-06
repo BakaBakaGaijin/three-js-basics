@@ -1,14 +1,9 @@
-import { Component, MutableRefObject } from "react";
 import * as THREE from "three";
 import { FrameHandler } from "../../utils/FrameHandler";
 
 const { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshPhongMaterial, Mesh } = THREE;
 
-interface CubeRendererProps {
-    containerRef: MutableRefObject<HTMLDivElement | null>;
-}
-
-class CubeRenderer extends Component<CubeRendererProps> {
+class CubeRenderer {
     private scene: THREE.Scene | null = null;
 
     private camera: THREE.PerspectiveCamera | null = null;
@@ -19,34 +14,22 @@ class CubeRenderer extends Component<CubeRendererProps> {
 
     private frameHandler: FrameHandler;
 
-    constructor(props: CubeRendererProps) {
-        super(props);
-
+    public constructor(container: HTMLDivElement) {
         this.handleFrame = this.handleFrame.bind(this);
         this.frameHandler = new FrameHandler(this.handleFrame);
-    }
-
-    componentDidMount() {
         this.scene = new Scene();
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.props.containerRef.current?.append(this.renderer.domElement);
-
+        container.append(this.renderer.domElement);
         const geometry = new BoxGeometry(1, 1, 1);
         const material = new MeshPhongMaterial({ color: 0x00ff00 });
         const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
         directionalLight.position.set(-1, 0, 1).normalize();
-
         this.cube = new Mesh(geometry, material);
         this.scene.add(this.cube);
         this.scene.add(directionalLight);
         this.camera.position.z = 5;
-
         this.frameHandler.start();
-    }
-
-    componentWillUnmount(): void {
-        this.frameHandler.stop();
     }
 
     private handleFrame(delta: number) {
@@ -57,7 +40,9 @@ class CubeRenderer extends Component<CubeRendererProps> {
         }
     }
 
-    render = () => null;
+    public dispose() {
+        this.frameHandler.stop();
+    }
 }
 
 export default CubeRenderer;

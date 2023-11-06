@@ -14,6 +14,8 @@ class CubeRenderer {
 
     private frameHandler: FrameHandler;
 
+    private readonly resizeObser: ResizeObserver;
+
     public constructor(container: HTMLDivElement) {
         this.handleFrame = this.handleFrame.bind(this);
         this.frameHandler = new FrameHandler(this.handleFrame);
@@ -30,6 +32,10 @@ class CubeRenderer {
         this.scene.add(directionalLight);
         this.camera.position.z = 5;
         this.frameHandler.start();
+
+        this.handleResize = this.handleResize.bind(this);
+        this.resizeObser = new ResizeObserver(() => this.handleResize());
+        this.resizeObser.observe(container);
     }
 
     private handleFrame(delta: number) {
@@ -42,6 +48,14 @@ class CubeRenderer {
 
     public dispose() {
         this.frameHandler.stop();
+    }
+
+    private handleResize() {
+        if (this.camera) {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
     }
 }
 
